@@ -14,13 +14,29 @@ function stateObject(initialState) {
         state = newState;
     }
 
-    function timeout(fn, delay) {
+    function noChangeTimeout(fn, delay) {
         var initialGen = gen;
         return setTimeout(function() {
             if (gen === initialGen) {
                 fn();
             }
         }, delay);
+    }
+
+    function stateDependentTimeout(onlyInState, fn, delay) {
+        return setTimeout(function() {
+            if (state === onlyInState) {
+                fn();
+            }
+        }, delay);
+    }
+
+    function timeout(onlyInState, fn, delay) {
+        if (typeof onlyInState === 'function') {
+            return noChangeTimeout(onlyInState, fn);
+        } else {
+            return stateDependentTimeout(onlyInState, fn, delay);
+        }
     }
 
     return {
